@@ -1,12 +1,12 @@
 ### Check for blocking
-''' sql
+```sql
 SELECT blocking_session_id, wait_type, wait_time, last_wait_type 
 FROM sys.dm_exec_requests 
 WHERE session_id > 50;
-'''
+```
 
 ### Identify the Source (The "Who" and "Where")
-''' sql
+``` sql
 SELECT 
     session_id, 
     host_name,       -- The computer name
@@ -15,21 +15,21 @@ SELECT
     status
 FROM sys.dm_exec_sessions
 WHERE session_id = 101; -- Replace with the current blocker ID
-'''
+```
 
 ###  Check the SQL Command
-''' sql
+``` sql
 DBCC INPUTBUFFER(101); -- Replace with the current blocker ID
-'''
+```
 
 ### Check what Session  is doing
 ''' sql
 SELECT session_id, command, percent_complete, status
 FROM sys.dm_exec_requests 
-WHERE session_id = 101;
+WHERE session_id = 101; -- Replace with the current blocker ID
 '''
 
 ### Stop or Kill job
-''' sql
-KILL 101;
-'''
+``` sql
+KILL 101; -- Replace with the current blocker ID
+```
