@@ -23,11 +23,11 @@ DBCC INPUTBUFFER(101); -- Replace with the current blocker ID
 ```
 
 ### Check what Session  is doing
-''' sql
+```sql
 SELECT session_id, command, percent_complete, status
 FROM sys.dm_exec_requests 
 WHERE session_id = 101; -- Replace with the current blocker ID
-'''
+```
 
 ### Stop or Kill job
 ``` sql
