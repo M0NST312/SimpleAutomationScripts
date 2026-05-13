@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML to PDF</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            font-family: monospace;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Paste Full HTML Source</h2>
+
+<textarea id="htmlInput">
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Hello World</h1>
+    <p>This page will become a PDF.</p>
+</body>
+</html>
+</textarea>
+
+<br>
+
+<button onclick="generatePDF()">
+    Generate PDF
+</button>
+
+<iframe id="preview"></iframe>
+
+<script>
+async function generatePDF() {
+
+    const html =
+        document.getElementById("htmlInput").value;
+
+    const iframe =
+        document.getElementById("preview");
+
+    // Render HTML inside iframe
+    iframe.srcdoc = html;
+
+    iframe.onload = async function () {
+
+        const iframeDoc =
+            iframe.contentDocument ||
+            iframe.contentWindow.document;
+
+        const body = iframeDoc.body;
+
+        // Capture rendered page
+        const canvas = await html2canvas(body, {
+            scale: 2,
+            useCORS: true
+        });
+
+        const imgData =
+            canvas.toDataURL("image/png");
+
+        const { jsPDF } = window.jspdf;
+
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        const pdfWidth = 210;
+        const pdfHeight = 297;
+
+        const imgWidth = pdfWidth;
+
+        const imgHeight =
+            (canvas.height * imgWidth) /
+            canvas.width;
+
+        let heightLeft = imgHeight;
+
+        let position = 0;
+
+        pdf.addImage(
+            imgData,
+            "PNG",
+            0,
+            position,
+            imgWidth,
+            imgHeight
+        );
+
+        heightLeft -= pdfHeight;
+
+        while (heightLeft > 0) {
+
+            position =
+                heightLeft - imgHeight;
+
+            pdf.addPage();
+
+            pdf.addImage(
+                imgData,
+                "PNG",
+                0,
+                position,
+                imgWidth,
+                imgHeight
+            );
+
+            heightLeft -= pdfHeight;
+        }
+
+        pdf.save("page.pdf");
+    };
+}
+</script>
+
+</body>
+</html>
